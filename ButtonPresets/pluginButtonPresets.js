@@ -120,9 +120,13 @@ styleButtonPresets.innerHTML = `
 /* Tooltip styling */
 .tooltip-presets {
   position: relative;
-  flex-grow: .1;
+  flex-grow: 0.1;
   margin: 0 4px;
-  overflow: hidden;
+}
+@media (max-width: 768px) {
+  .tooltip-presets {
+    overflow: hidden;
+  }
 }
 
 .tooltip-presets::after {
