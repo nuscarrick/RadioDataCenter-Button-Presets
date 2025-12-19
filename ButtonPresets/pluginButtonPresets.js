@@ -1092,7 +1092,7 @@ function updateButtons() {
         
         // Function to get the image source and determine if it’s local or external
         function getImageSrc() {
-          const logoImg = document.getElementById('station-logo');
+          const logoImg = null;
           if (logoImg && logoImg.src && !logoImg.src.startsWith('data:image/png;base64') && !logoImg.src.startsWith('data:image/webp;base64') && !logoImg.src.includes('default')) {
             const imageUrl = logoImg.src;
             if (isImageLocal(imageUrl)) {
@@ -1770,8 +1770,8 @@ function AdditionalCheckboxesButtonPresets() {
       newDiv.innerHTML = `
                 <div class="switch flex-container flex-phone flex-phone-column flex-phone-center">
                     <input type="checkbox" tabindex="0" id="hide-preset-buttons" aria-label="Hide preset buttons">
-                    <label for="hide-preset-buttons" class="tooltip" data-tooltip="Enable if you do not want to use the preset buttons."></label>
-                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Hide Preset Buttons</span>
+                    <label for="hide-preset-buttons"></label>
+                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Favorileri Gizle</span>
                 </div>
             `;
       
