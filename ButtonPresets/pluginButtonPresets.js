@@ -31,7 +31,7 @@ const enableDefaultLogo = 'unnamed'; // all, named, unnamed
 const infoIcon = true; // true, false
 const allowCustomFont = 'default'; // default, true, false
 const defaultPresetData = {
-  values: [87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5, 87.5],
+  values: [87.3, 87.3, 87.3, 87.3, 87.3, 87.3, 87.3, 87.3, 87.3, 87.3],
   antennas: ['', '', '', '', '', '', '', '', '', ''],
   names: ['', '', '', '', '', '', '', '', '', ''],
   urls: ['', '', '', '', '', '', '', '', '', '']
@@ -334,7 +334,7 @@ function getStoredData(bank) {
   if (bank === "A") {
     dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], antennas: [...defaultPresetData.antennas], ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
   } else {
-    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.5), antennas: Array(10).fill(''), ps: Array(10).fill(''), images: Array(10).fill('') };
+    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.3), antennas: Array(10).fill(''), ps: Array(10).fill(''), images: Array(10).fill('') };
   }
   return dataButtonPresets;
 }
@@ -354,6 +354,20 @@ function saveToLocalStorage(bank, buttonValues, antennaValues, psValues, buttonI
     images: sanitizedButtonImages,
     tooltips: sanitizedTooltipValues
   }));
+}
+
+function resetDefaultPresets(bank) {
+  if (!localStorage.getItem('resetDefaultPresetsDone') || localStorage.getItem('resetDefaultPresetsDone') == 0) {
+    const key = `buttonPresets${bank}`;
+    const dataButtonPresets = JSON.parse(localStorage.getItem(key)) || {};
+    const buttonPresets = dataButtonPresets?.values || [];
+    const newButtonPresets = buttonPresets.map((fre) => fre === 87.5 ? 87.3 : fre);
+    localStorage.setItem(key, JSON.stringify({
+      ...dataButtonPresets,
+      values: newButtonPresets,
+    }));
+    localStorage.setItem('resetDefaultPresetsDone', 1);
+  }
 }
 
 // Default to Bank A
@@ -387,6 +401,7 @@ bankNames.forEach(bank => {
   option.tabIndex = 0;
   option.textContent = `${bankName} ${bank}`; // Bank text
   dropdownOptions.appendChild(option);
+  resetDefaultPresets(bank);
 });
 dropdownContainer.appendChild(dropdownOptions);
 
@@ -728,11 +743,11 @@ function updateButtons() {
             let dataFrequencyElement = document.getElementById('data-frequency');
             let dataPsElement = document.getElementById('data-ps');
             let dataStationNameElement = document.getElementById('data-station-name');
-            let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.3';
             let dataPs = dataPsElement ? dataPsElement.textContent : '';
             let tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
             
-            buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            buttonValues[index] = parseFloat(dataFrequency) || 87.3;
             antennaValues[index] = getCurrentAntennaValue();
             psValues[index] = dataPs;
             tooltipValues[index] = tooltipValue;
@@ -784,11 +799,11 @@ function updateButtons() {
             let dataFrequencyElement = document.getElementById('data-frequency');
             let dataPsElement = document.getElementById('data-ps');
             let dataStationNameElement = document.getElementById('data-station-name');
-            let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+            let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.3';
             let dataPs = dataPsElement ? dataPsElement.textContent : '';
             let tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
             
-            buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+            buttonValues[index] = parseFloat(dataFrequency) || 87.3;
             antennaValues[index] = getCurrentAntennaValue();
             psValues[index] = dataPs;
             tooltipValues[index] = tooltipValue;
@@ -833,10 +848,10 @@ function updateButtons() {
               // SHIFT + S key combination
               let dataFrequencyElement = document.getElementById('data-frequency');
               let dataPsElement = document.getElementById('data-ps');
-              let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+              let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.3';
               let dataPs = dataPsElement ? dataPsElement.textContent : '';
               
-              buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+              buttonValues[index] = parseFloat(dataFrequency) || 87.3;
               antennaValues[index] = getCurrentAntennaValue();
               psValues[index] = dataPs;
               buttonImages[index] = getImageSrc();
@@ -845,7 +860,7 @@ function updateButtons() {
               checkBankASum();
             } else if (e.shiftKey && e.key === 'R') {
               // SHIFT + R key combination
-              buttonValues[index] = 87.5;
+              buttonValues[index] = 87.3;
               antennaValues[index] = '';
               psValues[index] = '';
               buttonImages[index] = '';
@@ -860,7 +875,7 @@ function updateButtons() {
         button.addEventListener('mousedown', function(e) {
           if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) {
             if (e.button === 1 || (e.shiftKey && e.button === 0)) {
-              buttonValues[index] = 87.5;
+              buttonValues[index] = 87.3;
               antennaValues[index] = '';
               psValues[index] = '';
               buttonImages[index] = '';
@@ -868,10 +883,10 @@ function updateButtons() {
             } else if (e.ctrlKey) {
               let dataFrequencyElement = document.getElementById('data-frequency');
               let dataPsElement = document.getElementById('data-ps');
-              let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.5';
+              let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.3';
               let dataPs = dataPsElement ? dataPsElement.textContent : '';
               
-              buttonValues[index] = parseFloat(dataFrequency) || 87.5;
+              buttonValues[index] = parseFloat(dataFrequency) || 87.3;
               antennaValues[index] = getCurrentAntennaValue();
               psValues[index] = dataPs;
               buttonImages[index] = getImageSrc();
@@ -1053,7 +1068,7 @@ function updateButtons() {
         
         function formatValue(value) {
           if (value === undefined) {
-            value = 87.5;
+            value = 87.3;
           }
 
           //   0-27 MHz : 3 decimal places
@@ -1211,7 +1226,7 @@ function getAllVisiblePresets() {
         presets.push({
           bank: bank,
           index: presetIndex,
-          frequency: buttonValues[presetIndex] || 87.5,
+          frequency: buttonValues[presetIndex] || 87.3,
           buttonId: `setFrequencyButton${bank}${presetIndex}`
         });
       }
@@ -1225,7 +1240,7 @@ function getAllVisiblePresets() {
       presets.push({
         bank: currentBank,
         index: presetIndex,
-        frequency: buttonValues[presetIndex] || 87.5,
+        frequency: buttonValues[presetIndex] || 87.3,
         buttonId: `setFrequencyButton${presetIndex}`
       });
     }
