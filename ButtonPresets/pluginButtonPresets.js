@@ -19,7 +19,7 @@ const bankMenuPaddingRight = '0' // value in px
 const bankMenuBorderLeftRadius = true; // true, false
 const bankMenuBorderRightRadius = true; // true, false
 const bankMenuCustomWidth = 'default'; // default, value in px or %
-const bankName = 'Bank'; // dropdown menu name
+const bankName = t('menu.bank'); // dropdown menu name
 const bankQuantity = 4; // total number of banks ranging from 3-8 (for 'top' or 'top-replace' use either 4 or 8)
 const optionHidePresetButtons = false; // true, false
 const optionHideDisplayAll = true; // true, false
@@ -743,7 +743,7 @@ function updateButtons() {
                 let antennaToast = optionSaveAntenna 
                     ? ` (Ant ${optionAntennaDisplay === 'letter' ? String.fromCharCode(65 + Number(getCurrentAntennaValue())) : Number(getCurrentAntennaValue()) + 1})` 
                     : '';
-                sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz${antennaToast}</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false);
+                sendToast('info', t('toast.presetButtons'), `${t('common.frequency')} <strong>${buttonValues[index]} MHz${antennaToast}</strong> ${t('toast.savedToPresetBlank')} <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false);
             }
             console.log(`[${pluginName}] Preset saved:`, buttonValues[index] + ` (${getCurrentAntennaValue()})`, currentBank, (index + 1));
           });
@@ -799,7 +799,7 @@ function updateButtons() {
                 let antennaToast = optionSaveAntenna 
                     ? ` (Ant ${optionAntennaDisplay === 'letter' ? String.fromCharCode(65 + Number(getCurrentAntennaValue())) : Number(getCurrentAntennaValue()) + 1})` 
                     : '';
-                sendToast('info', 'Preset Buttons', `Frequency <strong>${buttonValues[index]} MHz${antennaToast}</strong> saved to preset bank <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false);
+                sendToast('info', t('toast.presetButtons'), `${t('common.frequency')} <strong>${buttonValues[index]} MHz${antennaToast}</strong> ${t('toast.savedToPresetBlank')} <b>${currentBank}</b>, button <b>#${(index + 1)}</b>.`, false, false);
             }
             console.log(`[${pluginName}] Preset saved:`, buttonValues[index] + ` (${getCurrentAntennaValue()})`, currentBank, (index + 1));
           }
@@ -1545,7 +1545,7 @@ function toggleButtonContainer(statusToast) {
   const isHidden = JSON.parse(localStorage.getItem(DISPLAY_KEY_ButtonPresets)) == true;
   if (isHidden) {
     if (typeof sendToast === 'function') {
-      sendToast('info', 'Preset Buttons', 'Preset Buttons hidden.', false, false);
+      sendToast('info', t('toast.presetButtons'), t('toast.presetButtonsHidden'), false, false);
       console.log(`[${pluginName}] Button Preset plugin hidden`);
     }
     let element = document.getElementById('plugin-button-presets');
@@ -1572,7 +1572,7 @@ function toggleButtonContainer(statusToast) {
     
   } else {
     if (typeof sendToast === 'function' && statusToast) {
-      sendToast('info', 'Preset Buttons', 'Preset Buttons restored.', false, false);
+      sendToast('info', t('toast.presetButtons'), t('toast.presetButtonsRestored'), false, false);
       console.log(`[${pluginName}] Button Preset plugin restored`);
     }
     let element = document.getElementById('plugin-button-presets');
@@ -1614,19 +1614,9 @@ function initTooltipsOnce() {
     $(document).on('mousedown', () => { clearTimeout($(this).data('timeout')); return; });
     if (!document.querySelector('.tooltip-presets-once')) { return; }
     if (!/Mobi|Android|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
-      tooltipText = `
-            <strong><i>[</i></strong> and <strong><i>]</i></strong> to navigate through the presets.<br>
-            <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.<br>
-            <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.<br>
-            <strong><i>Middle-click</i></strong> or <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.<br>
-            <strong>Stored presets do not affect other browsers.</strong>
-            `;
+      tooltipText = t('plugin.buttonPresets.tooltipMobile');
     } else {
-      tooltipText = `
-            Tap to recall the preset.<br>
-            Long press to store the preset.<br>
-            <strong>Stored presets do not affect other browsers.</strong>
-            `;
+      tooltipText = t('plugin.buttonPresets.tooltipDesktop');
     }
     // Add a delay of 500 milliseconds before creating and appending the tooltip
     $(this).data('timeout', setTimeout(() => {
@@ -1677,9 +1667,9 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
             newDiv.className = 'form-group';
             newDiv.innerHTML = `
                 <div class="switch flex-container flex-phone flex-phone-column flex-phone-center">
-                    <input type="checkbox" tabindex="0" id="show-all-preset-buttons" aria-label="Show all preset buttons">
-                    <label for="show-all-preset-buttons" class="tooltip" data-tooltip="Enable to display all preset banks on screen."></label>
-                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Show All Presets</span>
+                    <input type="checkbox" tabindex="0" id="show-all-preset-buttons" aria-label="${t('plugin.buttonPresets.showAllPresetButtons')}">
+                    <label for="show-all-preset-buttons" class="tooltip" data-tooltip="${t('plugin.buttonPresets.enableAllPresetBanks')}"></label>
+                    <span class="text-smaller text-uppercase text-bold color-4 p-10">${t('plugin.buttonPresets.showAllPresets')}</span>
                 </div>
             `;
             
@@ -1769,9 +1759,9 @@ function AdditionalCheckboxesButtonPresets() {
       newDiv.className = 'form-group';
       newDiv.innerHTML = `
                 <div class="switch flex-container flex-phone flex-phone-column flex-phone-center">
-                    <input type="checkbox" tabindex="0" id="hide-preset-buttons" aria-label="Hide preset buttons">
+                    <input type="checkbox" tabindex="0" id="hide-preset-buttons" aria-label="${t('plugin.buttonPresets.hidePresetButtons')}">
                     <label for="hide-preset-buttons"></label>
-                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Favorileri Gizle</span>
+                    <span class="text-smaller text-uppercase text-bold color-4 p-10">${t('plugin.buttonPresets.hidePresets')}</span>
                 </div>
             `;
       
@@ -1859,18 +1849,18 @@ function executeInfoCode() {
     if (bankMenuLocation.includes('top')) bankText = '';
     if (bankQuantity > 3) bankQuantityText = ', etc...';
     const popupId = "#popup-panel-mobile-settings";
-    const newTitle = `Preset Buttons`;
-    const newContent = `<p style="text-align: center;"><i>This feature allows you to store up to ${bankQuantity * 10} presets, with 10 presets per bank.
-    To store a frequency:</i>
+    const newTitle = t('plugin.buttonPresets.presetButtons');
+    const newContent = `<p style=\"text-align: center;\"><i>Bu özellik, banka başına 10 ön ayar olmak üzere en fazla ${bankQuantity * 10} ön ayar depolamanıza olanak tanır.
+    Bir frekansı depolamak için:</i>
 
-    <strong><i>[</i></strong> and <strong><i>]</i></strong> to navigate through the presets.
-    <strong><i>Left-click</i></strong> or <strong><i>ENTER</i></strong> to recall the preset.
-    <strong><i>Right-click</i></strong>, <strong><i>CTRL+click</i></strong>, or <strong><i>SHIFT+S</i></strong> to store the preset.
-    <strong><i>Middle-click</i></strong>, <strong><i>SHIFT+click</i></strong>, or <strong><i>SHIFT+R</i></strong> to reset the preset.
-    
-    Use the ${bankText}dropdown menu to select from Banks <i>A</i>, <i>B</i>, or <i>C</i>${bankQuantityText}
+    ${t('plugin.buttonPresets.alertExecuteIconInfo1')}
+    ${t('plugin.buttonPresets.alertExecuteIconInfo2')}
+    ${t('plugin.buttonPresets.alertExecuteIconInfo3')}
+    ${t('plugin.buttonPresets.alertExecuteIconInfo4')}
 
-    <strong>Stored presets are saved only on the current browser.</strong>
+    Banklar <i>A</i>, <i>B</i> veya <i>C</i>${bankQuantityText} arasından seçim yapmak için ${bankText} açılır menüsünü kullanın
+
+    <strong>${t('plugin.buttonPresets.alertExecuteIconInfo5')}</strong>
     </p>`;
     const formattedContent = newContent.replace(/\n/g, '<br>');
     popupMethod(popupId, newTitle, formattedContent);
@@ -2056,12 +2046,12 @@ function importLocalStorageFromFile(file) {
       checkImageErrors();
 
       if (typeof sendToast === 'function') {
-        sendToast('success', 'Preset Buttons Import', 'Preset data successfully imported.', false, false);
+        sendToast('success', t('toast.presetButtonsImport'), t('toast.presetDataImportSuccess'), false, false);
       }
       console.log(`[${pluginName}] Button Preset localStorage updated successfully`);
     } catch (e) {
       if (typeof sendToast === 'function') {
-        sendToast('error', 'Preset Buttons Import', 'Error importing preset data.', false, false);
+        sendToast('error', t('toast.presetButtonsImport'), t('toast.presetDataImportError'), false, false);
       }
       console.error('Unable to import localStorage preset data', e);
     }
@@ -2080,7 +2070,7 @@ function createImportExportButtons() {
   const exportButton = document.createElement('button');
   exportButton.id = 'export-button-preset';
   exportButton.classList.add('tooltip-presets');
-  exportButton.setAttribute('data-tooltip', 'Export presets to file');
+  exportButton.setAttribute('data-tooltip', t('plugin.buttonPresets.exportToFile'));
   exportButton.style.fontSize = '14px';
   exportButton.style.backgroundColor = '#990903';
   exportButton.style.border = 'none';
@@ -2100,7 +2090,7 @@ function createImportExportButtons() {
   const importButton = document.createElement('button');
   importButton.id = 'import-button-preset';
   importButton.classList.add('tooltip-presets');
-  importButton.setAttribute('data-tooltip', 'Import presets from file');
+  importButton.setAttribute('data-tooltip', t('plugin.buttonPresets.importFromFile'));
   importButton.style.fontSize = '14px';
   importButton.style.backgroundColor = '#036009';
   importButton.style.border = 'none';
@@ -2217,7 +2207,7 @@ function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFet
     fetchFirstLine().then(newVersion => {
         if (newVersion) {
             if (newVersion !== pluginVersion) {
-                let updateConsoleText = "There is a new version of this plugin available";
+                let updateConsoleText = t('plugin.newVersionAvailable');
                 // Any custom code here
                 
                 console.log(`[${pluginName}] ${updateConsoleText}`);
@@ -2231,9 +2221,9 @@ function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFet
           const pluginSettings = document.getElementById('plugin-settings');
           if (pluginSettings) {
             const currentText = pluginSettings.textContent.trim();
-            const newText = `<a href="${urlUpdateLink}" target="_blank">[${pluginName}] Update available: ${pluginVersion} --> ${newVersion}</a><br>`;
+            const newText = `<a href="${urlUpdateLink}" target="_blank">[${pluginName}] ${t('plugin.updateAvailable')}: ${pluginVersion} --> ${newVersion}</a><br>`;
 
-            if (currentText === 'No plugin settings are available.') {
+            if (currentText === t('plugin.noPluginSettings')) {
               pluginSettings.innerHTML = newText;
             } else {
               pluginSettings.innerHTML += ' ' + newText;
