@@ -720,12 +720,15 @@ function updateButtons() {
     let buttonImages = storedData.images || [];
     let tooltipValues = storedData.tooltips || [];
 
-    for (let i = 0; i < 10; i++) {
+    
+    const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
+    // Old is 10, new is number of favorite frequencies
+    const numberOfFavoriteFrequencies = favoriteFrequencies?.length || 10;
+    for (let i = 0; i < numberOfFavoriteFrequencies; i++) {
       (function(index, buttonBank) {
         let button = document.createElement("button");
         const buttonId = bankDisplayAll ? `setFrequencyButton${buttonBank}${index}` : `setFrequencyButton${index}`;
         button.id = buttonId; // Create unique IDs for "Show All Presets"
-        const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
         const isDefault = (favoriteFrequencies[index] || favoriteFrequencies.includes(buttonValues[index]));
         button.classList.add('tooltip-presets', 'tooltip-presets-once', isDefault ? 'preset-default' : 'preset-local');
         button.setAttribute('data-tooltip', tooltipValues[index] || psValues[index]); // Tooltip uses data-station-name if available, otherwise psValue
@@ -1165,7 +1168,7 @@ updateButtons();
 
 setInterval(() => {
   updateButtons();
-}, 30*1000);
+}, 1000);
 
 // Keyboard preset navigation
 startFrequencyMonitoring();
