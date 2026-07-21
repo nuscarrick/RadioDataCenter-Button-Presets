@@ -1,8 +1,8 @@
 // Plugin configuration, this is used in the administration when plugins are loaded
 var pluginConfig = {
     name: 'Preset Buttons',
-    version: '1.3.5',
-    author: 'AAD',
+    version: '1.0',
+    author: 'RadioDataCenter',
     frontEndPath: 'ButtonPresets/pluginButtonPresets.js'
 }
 
