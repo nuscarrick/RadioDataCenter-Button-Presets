@@ -1570,7 +1570,7 @@ function toggleButtonContainer(statusToast) {
   const isHidden = JSON.parse(localStorage.getItem(DISPLAY_KEY_ButtonPresets)) == true;
   if (isHidden) {
     if (typeof sendToast === 'function') {
-      sendToast('info', 'Preset Buttons', 'Preset Buttons hidden.', false, false);
+      sendToast('info', typeof t === 'function' ? t('plugin.buttonPresets.presetButtons') : 'Preset Buttons', typeof t === 'function' ? t('plugin.buttonPresets.presetButtonsHidden') : 'Preset Buttons hidden.', false, false);
       console.log(`[${pluginName}] Button Preset plugin hidden`);
     }
     let element = document.getElementById('plugin-button-presets');
@@ -1597,7 +1597,7 @@ function toggleButtonContainer(statusToast) {
     
   } else {
     if (typeof sendToast === 'function' && statusToast) {
-      sendToast('info', 'Preset Buttons', 'Preset Buttons restored.', false, false);
+      sendToast('info', typeof t === 'function' ? t('plugin.buttonPresets.presetButtons') : 'Preset Buttons', typeof t === 'function' ? t('plugin.buttonPresets.presetButtonsRestored') : 'Preset Buttons restored.', false, false);
       console.log(`[${pluginName}] Button Preset plugin restored`);
     }
     let element = document.getElementById('plugin-button-presets');
@@ -1702,9 +1702,9 @@ function AdditionalCheckboxesDisplayAll() { // ########## SHOW ALL PRESET BUTTON
             newDiv.className = 'form-group';
             newDiv.innerHTML = `
                 <div class="switch flex-container flex-phone flex-phone-column flex-phone-center">
-                    <input type="checkbox" tabindex="0" id="show-all-preset-buttons" aria-label="Show all preset buttons">
-                    <label for="show-all-preset-buttons" class="tooltip" data-tooltip="Enable to display all preset banks on screen."></label>
-                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Show All Presets</span>
+                    <input type="checkbox" tabindex="0" id="show-all-preset-buttons" aria-label="${typeof t === 'function' ? t('plugin.buttonPresets.showAllPresetButtons') : 'Show all preset buttons'}">
+                    <label for="show-all-preset-buttons" class="tooltip" data-tooltip="${typeof t === 'function' ? t('plugin.buttonPresets.enableAllPresetBanks') : 'Enable to display all preset banks on screen.'}"></label>
+                    <span class="text-smaller text-uppercase text-bold color-4 p-10">${typeof t === 'function' ? t('plugin.buttonPresets.showAllPresets') : 'Show All Presets'}</span>
                 </div>
             `;
             
@@ -1794,9 +1794,9 @@ function AdditionalCheckboxesButtonPresets() {
       newDiv.className = 'form-group';
       newDiv.innerHTML = `
                 <div class="switch flex-container flex-phone flex-phone-column flex-phone-center">
-                    <input type="checkbox" tabindex="0" id="hide-preset-buttons" aria-label="Hide preset buttons">
+                    <input type="checkbox" tabindex="0" id="hide-preset-buttons" aria-label="${typeof t === 'function' ? t('plugin.buttonPresets.hidePresetButtons') : 'Hide preset buttons'}">
                     <label for="hide-preset-buttons"></label>
-                    <span class="text-smaller text-uppercase text-bold color-4 p-10">Favorileri Gizle</span>
+                    <span class="text-smaller text-uppercase text-bold color-4 p-10">${typeof t === 'function' ? t('plugin.buttonPresets.hidePresets') : 'Hide Presets'}</span>
                 </div>
             `;
       
@@ -2081,12 +2081,12 @@ function importLocalStorageFromFile(file) {
       checkImageErrors();
 
       if (typeof sendToast === 'function') {
-        sendToast('success', 'Preset Buttons Import', 'Preset data successfully imported.', false, false);
+        sendToast('success', typeof t === 'function' ? t('plugin.buttonPresets.presetButtons') : 'Preset Buttons', typeof t === 'function' ? t('plugin.buttonPresets.presetDataImported') : 'Preset data successfully imported.', false, false);
       }
       console.log(`[${pluginName}] Button Preset localStorage updated successfully`);
     } catch (e) {
       if (typeof sendToast === 'function') {
-        sendToast('error', 'Preset Buttons Import', 'Error importing preset data.', false, false);
+        sendToast('error', typeof t === 'function' ? t('plugin.buttonPresets.presetButtons') : 'Preset Buttons', typeof t === 'function' ? t('plugin.buttonPresets.presetDataImportError') : 'Error importing preset data.', false, false);
       }
       console.error('Unable to import localStorage preset data', e);
     }
@@ -2105,7 +2105,7 @@ function createImportExportButtons() {
   const exportButton = document.createElement('button');
   exportButton.id = 'export-button-preset';
   exportButton.classList.add('tooltip-presets');
-  exportButton.setAttribute('data-tooltip', 'Export presets to file');
+  exportButton.setAttribute('data-tooltip', typeof t === 'function' ? t('plugin.buttonPresets.exportToFile') : 'Export presets to file');
   exportButton.style.fontSize = '14px';
   exportButton.style.backgroundColor = '#990903';
   exportButton.style.border = 'none';
@@ -2125,7 +2125,7 @@ function createImportExportButtons() {
   const importButton = document.createElement('button');
   importButton.id = 'import-button-preset';
   importButton.classList.add('tooltip-presets');
-  importButton.setAttribute('data-tooltip', 'Import presets from file');
+  importButton.setAttribute('data-tooltip', typeof t === 'function' ? t('plugin.buttonPresets.importFromFile') : 'Import presets from file');
   importButton.style.fontSize = '14px';
   importButton.style.backgroundColor = '#036009';
   importButton.style.border = 'none';
@@ -2258,7 +2258,8 @@ function checkUpdate(setupOnly, pluginVersion, pluginName, urlUpdateLink, urlFet
             const currentText = pluginSettings.textContent.trim();
             const newText = `<a href="${urlUpdateLink}" target="_blank">[${pluginName}] Update available: ${pluginVersion} --> ${newVersion}</a><br>`;
 
-            if (currentText === 'No plugin settings are available.') {
+            const noPluginSettingsText = typeof t === 'function' ? t('plugin.noPluginSettings') : 'No plugin settings are available.';
+            if (currentText === noPluginSettingsText) {
               pluginSettings.innerHTML = newText;
             } else {
               pluginSettings.innerHTML += ' ' + newText;
