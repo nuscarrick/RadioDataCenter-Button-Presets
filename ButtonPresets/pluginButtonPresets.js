@@ -62,8 +62,8 @@ const defaultPresetData = {
 
 const pluginVersion = '1.0';
 const pluginName = "Preset Buttons";
-const pluginHomepageUrl = "https://github.com/nuscarrick/FM-DX-Webserver-Plugin-Button-Presets";
-const pluginUpdateUrl = "https://raw.githubusercontent.com/nuscarrick/FM-DX-Webserver-Plugin-Button-Presets/main/ButtonPresets/pluginButtonPresets.js";
+const pluginHomepageUrl = "https://github.com/nuscarrick/RadioDataCenter-Button-Presets";
+const pluginUpdateUrl = "https://raw.githubusercontent.com/nuscarrick/RadioDataCenter-Button-Presets/main/ButtonPresets/pluginButtonPresets.js";
 const pluginSetupOnlyNotify = true;
 const CHECK_FOR_UPDATES = true;
 
