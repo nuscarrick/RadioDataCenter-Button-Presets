@@ -288,6 +288,9 @@ styleButtonPresets.innerHTML = `
         width: calc(100% - 12px) !important;
     }
 }
+.preset-default span.button-text {
+  color: var(--color-main-bright)!important;
+}
 `;
 // Append the style to the head of the document
 document.head.appendChild(styleButtonPresets);
@@ -336,6 +339,19 @@ function getStoredData(bank) {
   } else {
     dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.3), antennas: Array(10).fill(''), ps: Array(10).fill(''), images: Array(10).fill('') };
   }
+  const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
+  const localFavoriteFrequencies = [
+    ...favoriteFrequencies,
+    ...dataButtonPresets.values,
+  ]
+  const uniqueFavoriteFrequencies = localFavoriteFrequencies.filter((frequency, index, self) => self.indexOf(frequency) === index).slice(0, 10);
+  
+  // Sync local storage if difference
+  if (JSON.stringify(dataButtonPresets.values) !== JSON.stringify(uniqueFavoriteFrequencies)) {
+    dataButtonPresets.values = uniqueFavoriteFrequencies;
+    localStorage.setItem(key, JSON.stringify(dataButtonPresets));
+  }
+  dataButtonPresets.values = uniqueFavoriteFrequencies;
   return dataButtonPresets;
 }
 
@@ -709,7 +725,10 @@ function updateButtons() {
         let button = document.createElement("button");
         const buttonId = bankDisplayAll ? `setFrequencyButton${buttonBank}${index}` : `setFrequencyButton${index}`;
         button.id = buttonId; // Create unique IDs for "Show All Presets"
-        button.classList.add('tooltip-presets', 'tooltip-presets-once');
+        
+        const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
+        const isDefault = (favoriteFrequencies[index] || favoriteFrequencies.includes(buttonValues[index]));
+        button.classList.add('tooltip-presets', 'tooltip-presets-once', isDefault ? 'preset-default' : 'preset-local');
         button.setAttribute('data-tooltip', tooltipValues[index] || psValues[index]); // Tooltip uses data-station-name if available, otherwise psValue
         button.style.minWidth = "60px";
         button.style.width = "8%";
@@ -746,8 +765,14 @@ function updateButtons() {
             let dataFrequency = dataFrequencyElement ? dataFrequencyElement.textContent : '87.3';
             let dataPs = dataPsElement ? dataPsElement.textContent : '';
             let tooltipValue = (dataStationNameElement && dataStationNameElement.offsetParent !== null) ? dataStationNameElement.textContent : dataPs;
+
             
             buttonValues[index] = parseFloat(dataFrequency) || 87.3;
+            // prevent save override to favorite frequencies from server
+            const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
+            if (favoriteFrequencies[index] || favoriteFrequencies.includes(buttonValues[index])) {
+              return;
+            }
             antennaValues[index] = getCurrentAntennaValue();
             psValues[index] = dataPs;
             tooltipValues[index] = tooltipValue;
