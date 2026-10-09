@@ -331,7 +331,7 @@ buttonContainer.style.marginLeft = "6px";
 buttonContainer.style.marginRight = "6px";
 
 // Function to get stored button values, data-ps values, and images from localStorage
-function getStoredData(bank) {
+function getLocalPresetData(bank) {
   const key = `buttonPresets${bank}`;
   let dataButtonPresets;
   if (bank === "A") {
@@ -339,20 +339,34 @@ function getStoredData(bank) {
   } else {
     dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.3), antennas: Array(10).fill(''), ps: Array(10).fill(''), images: Array(10).fill('') };
   }
-  const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
-  const localFavoriteFrequencies = [
-    ...favoriteFrequencies,
-    ...dataButtonPresets.values,
-  ]
-  const uniqueFavoriteFrequencies = localFavoriteFrequencies.filter((frequency, index, self) => self.indexOf(frequency) === index).slice(0, 10);
-  
-  // Sync local storage if difference
-  if (JSON.stringify(dataButtonPresets.values) !== JSON.stringify(uniqueFavoriteFrequencies)) {
-    dataButtonPresets.values = uniqueFavoriteFrequencies;
-    localStorage.setItem(key, JSON.stringify(dataButtonPresets));
-  }
-  dataButtonPresets.values = uniqueFavoriteFrequencies;
   return dataButtonPresets;
+}
+
+function getFavoriteFrequencies() {
+  try {
+    const values = JSON.parse(localStorage.getItem('favoriteFrequencies'));
+    return Array.isArray(values) ? values.slice(0, 10) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+// Assignments replace leading slots without moving or deduplicating local presets.
+// Keep the overlay out of storage so removing it restores the user's presets.
+function getStoredData(bank) {
+  const localData = getLocalPresetData(bank);
+  const data = { ...localData };
+  const keys = ['values', 'antennas', 'ps', 'images', 'tooltips'];
+  keys.forEach(key => { data[key] = [...(localData[key] || [])]; });
+  getFavoriteFrequencies().forEach((frequency, index) => {
+    const oldIndex = Number(localData.values[index]) === Number(frequency)
+      ? index : localData.values.findIndex(value => Number(value) === Number(frequency));
+    data.values[index] = Number(frequency);
+    keys.slice(1).forEach(key => {
+      data[key][index] = oldIndex >= 0 ? (localData[key] || [])[oldIndex] || '' : '';
+    });
+  });
+  return data;
 }
 
 // Function to save button values, data-ps values, and images to localStorage
@@ -363,13 +377,20 @@ function saveToLocalStorage(bank, buttonValues, antennaValues, psValues, buttonI
   const sanitizedButtonImages = buttonImages.map(value => value === null ? "" : value);
   const sanitizedTooltipValues = tooltipValues.map(value => value === null ? "" : value);
 
-  localStorage.setItem(`buttonPresets${bank}`, JSON.stringify({
+  const data = {
     values: sanitizedButtonValues,
     antennas: sanitizedAntennaValues,
     ps: sanitizedPsValues,
     images: sanitizedButtonImages,
     tooltips: sanitizedTooltipValues
-  }));
+  };
+  const localData = getLocalPresetData(bank);
+  getFavoriteFrequencies().forEach((frequency, index) => {
+    Object.keys(data).forEach(key => {
+      data[key][index] = (localData[key] || [])[index] ?? '';
+    });
+  });
+  localStorage.setItem(`buttonPresets${bank}`, JSON.stringify(data));
 }
 
 function resetDefaultPresets(bank) {
@@ -726,8 +747,7 @@ function updateButtons() {
         const buttonId = bankDisplayAll ? `setFrequencyButton${buttonBank}${index}` : `setFrequencyButton${index}`;
         button.id = buttonId; // Create unique IDs for "Show All Presets"
         
-        const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
-        const isDefault = (favoriteFrequencies[index] || favoriteFrequencies.includes(buttonValues[index]));
+        const isDefault = index < getFavoriteFrequencies().length;
         button.classList.add('tooltip-presets', 'tooltip-presets-once', isDefault ? 'preset-default' : 'preset-local');
         button.setAttribute('data-tooltip', tooltipValues[index] || psValues[index]); // Tooltip uses data-station-name if available, otherwise psValue
         button.style.minWidth = "60px";
@@ -759,6 +779,7 @@ function updateButtons() {
           
           button.addEventListener('contextmenu', function(e) {
             e.preventDefault();
+            if (isDefault) return;
             let dataFrequencyElement = document.getElementById('data-frequency');
             let dataPsElement = document.getElementById('data-ps');
             let dataStationNameElement = document.getElementById('data-station-name');
@@ -768,11 +789,6 @@ function updateButtons() {
 
             
             buttonValues[index] = parseFloat(dataFrequency) || 87.3;
-            // prevent save override to favorite frequencies from server
-            const favoriteFrequencies = JSON.parse(localStorage.getItem('favoriteFrequencies')) || [];
-            if (favoriteFrequencies[index] || favoriteFrequencies.includes(buttonValues[index])) {
-              return;
-            }
             antennaValues[index] = getCurrentAntennaValue();
             psValues[index] = dataPs;
             tooltipValues[index] = tooltipValue;
@@ -821,6 +837,7 @@ function updateButtons() {
           });
           
           function savePreset() {
+            if (isDefault) return;
             let dataFrequencyElement = document.getElementById('data-frequency');
             let dataPsElement = document.getElementById('data-ps');
             let dataStationNameElement = document.getElementById('data-station-name');
@@ -868,7 +885,7 @@ function updateButtons() {
         document.addEventListener('keydown', function(e) {
           let isButtonFocused = document.activeElement === button;
 
-          if (isButtonFocused) {
+          if (isButtonFocused && !isDefault) {
             if (e.shiftKey && e.key === 'S') {
               // SHIFT + S key combination
               let dataFrequencyElement = document.getElementById('data-frequency');
@@ -898,7 +915,7 @@ function updateButtons() {
 
         // Handle mouse events
         button.addEventListener('mousedown', function(e) {
-          if (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0)) {
+          if (!isDefault && (e.button === 1 || e.ctrlKey || (e.shiftKey && e.button === 0))) {
             if (e.button === 1 || (e.shiftKey && e.button === 0)) {
               buttonValues[index] = 87.3;
               antennaValues[index] = '';
@@ -1088,7 +1105,7 @@ function updateButtons() {
               currentBank = '';
             }
           }
-          saveToLocalStorage(currentBank, buttonValues, antennaValues, psValues, buttonImages, tooltipValues);
+          saveToLocalStorage(buttonBank, buttonValues, antennaValues, psValues, buttonImages, tooltipValues);
         }
         
         function formatValue(value) {
@@ -1157,6 +1174,8 @@ function updateButtons() {
     setTimeout(highlightActivePreset, 200);
   }
 }
+
+window.addEventListener('favoriteFrequenciesUpdated', updateButtons);
 
 // Set default bank to A and update buttons on load
 currentBank = 'A';
