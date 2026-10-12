@@ -333,13 +333,34 @@ buttonContainer.style.marginRight = "6px";
 // Function to get stored button values, data-ps values, and images from localStorage
 function getLocalPresetData(bank) {
   const key = `buttonPresets${bank}`;
-  let dataButtonPresets;
-  if (bank === "A") {
-    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: [...defaultPresetData.values], antennas: [...defaultPresetData.antennas], ps: [...defaultPresetData.names], images: [...defaultPresetData.urls] };
-  } else {
-    dataButtonPresets = JSON.parse(localStorage.getItem(key)) || { values: Array(10).fill(87.3), antennas: Array(10).fill(''), ps: Array(10).fill(''), images: Array(10).fill('') };
+  const defaults = bank === "A"
+    ? { values: defaultPresetData.values, antennas: defaultPresetData.antennas, ps: defaultPresetData.names, images: defaultPresetData.urls }
+    : { values: [], antennas: [], ps: [], images: [] };
+  let stored;
+  try {
+    stored = JSON.parse(localStorage.getItem(key));
+  } catch (e) {
+    stored = null;
   }
-  return dataButtonPresets;
+  const data = stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+  const frequencyOrDefault = (value, fallback) => {
+    const numeric = typeof value === 'number' || (typeof value === 'string' && value.trim() !== '')
+      ? Number(value) : NaN;
+    return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
+  };
+  // Older first-run migrations stored empty arrays. Normalize the data used by
+  // both rendering and recall without writing defaults or assignments to storage.
+  const result = { ...data };
+  result.values = Array.from({ length: 10 }, (_, index) => {
+    const fallback = frequencyOrDefault((defaults.values || [])[index], 87.3);
+    return frequencyOrDefault(Array.isArray(data.values) ? data.values[index] : undefined, fallback);
+  });
+  ['antennas', 'ps', 'images', 'tooltips'].forEach(field => {
+    const values = Array.isArray(data[field]) ? data[field] : [];
+    const fallback = defaults[field] || [];
+    result[field] = Array.from({ length: 10 }, (_, index) => values[index] ?? fallback[index] ?? '');
+  });
+  return result;
 }
 
 function getFavoriteFrequencies() {
