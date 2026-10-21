@@ -105,11 +105,7 @@ if (window.fmscanPresets) {
       button.disabled = busy || !latest.presetsAvailable;
       button.title = row ? String(row.assigned ? row.name || '' : row.label || row.ps || '') : tr('presets.empty', 'Empty preset');
       button.setAttribute('aria-label', [row?.assigned ? tr('presets.locked', 'Assigned favorite, locked') : tr('presets.own', 'Personal preset'), button.title, row ? (row.frequency_khz / 1000).toFixed(3) + ' MHz' : String(index + 1)].join(' '));
-      const imageUrl = !row?.assigned && presets.safeImage(row?.image_url);
-      if (imageUrl) {
-        const image = document.createElement('img'); image.src = imageUrl; image.alt = ''; image.referrerPolicy = 'no-referrer';
-        image.style.cssText = 'max-width:32px;max-height:24px'; image.addEventListener('error', () => image.remove()); button.appendChild(image);
-      }
+      // FMSCAN uses compact text-only buttons; keep saved image metadata intact.
       const ps = document.createElement('span'); ps.className = 'button-text'; ps.textContent = row?.ps || ''; button.appendChild(ps);
       const frequency = document.createElement('div'); frequency.textContent = row ? (row.frequency_khz / 1000).toFixed(3) : '—'; button.appendChild(frequency);
       let timer = null; let held = false;
